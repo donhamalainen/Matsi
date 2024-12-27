@@ -31,9 +31,8 @@ type AuthType = {
 
 const NETWORK = "home";
 const API_URL =
-  NETWORK === "home"
-    ? "http://192.168.76.182:3000/api"
-    : "http://172.20.10.2:3000/api";
+  // "http://192.168.76.182:3000/api"
+  "http://172.20.10.2:3000/api";
 
 console.log(API_URL);
 const AuthContext = createContext<AuthType>({
@@ -100,7 +99,6 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
         email,
       });
 
-      // OTP lähetetty onnistuneesti
       return {
         success: true,
         message: "OTP on lähetetty sähköpostiisi. Tarkista postilaatikkosi.",
@@ -154,36 +152,54 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
         otp,
       });
 
-      // Tarkistetaan, että pyyntö onnistui
-      if (result.status === 200) {
-        const { token, user } = result.data;
-        console.log({
-          token,
-          id: user.id,
-          username: user.username,
-          created: user.created_at,
-          updated: user.updated_at,
-        });
-        setTimeout;
-        await setSession(token);
-        // Aseta Axiosin oletuspääotsikko, jotta kaikki pyynnöt ovat autentikoituja
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      const { token, user } = result.data;
+      console.log({
+        token,
+        id: user.id,
+        username: user.username,
+        created: user.created_at,
+        updated: user.updated_at,
+      });
+      setTimeout;
+      await setSession(token);
+      // Aseta Axiosin oletuspääotsikko, jotta kaikki pyynnöt ovat autentikoituja
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        return { success: true, message: "Kirjautuminen onnistui" };
-      } else {
-        return {
-          success: false,
-          message: "Tuntematon virhe tapahtui. Yritä uudelleen.",
-          error: true,
-        };
+      return { success: true, message: "Kirjautuminen onnistui" };
+    } catch (error: any) {
+      let errorMessage =
+        "Jokin meni pieleen. Tarkista yhteytesi ja yritä uudelleen.";
+
+      console.error("OTP verification failed:", error.message);
+
+      if (error.response) {
+        // Backendin palauttama virhekoodi
+        const status = error.response.status;
+        switch (status) {
+          case 401:
+            errorMessage =
+              "Vahvistuskoodi on väärin tai vanhentunut. Yritä uudelleen tai ota yhteyttä tukeen";
+            break;
+          case 500:
+            errorMessage =
+              "Palvelimessa tapahtui virhe. Yritä myöhemmin uudelleen.";
+            break;
+          default:
+            errorMessage = error.response.data?.message || errorMessage;
+            break;
+        }
+      } else if (error.message === "Network Error") {
+        // Verkko-ongelmat
+        errorMessage =
+          "Verkkoyhteys epäonnistui. Tarkista internet-yhteys tai tarkista osoitteesta www.boggo.fi/matsi palvelimien tilanne";
       }
-    } catch (error) {
-      console.error("OTP verification failed:", error);
 
-      // Tarkista, onko virhe verkko-ongelmia vai muuta
-      const errorMessage = (error as any).response?.data?.message
-        ? (error as any).response.data.message
-        : "Jokin meni pieleen. Tarkista yhteytesi ja yritä uudelleen.";
+      // Näytä hälytys
+      showAlarm({
+        type: "error",
+        title: "Virhe",
+        message: errorMessage,
+      });
 
       return {
         success: false,

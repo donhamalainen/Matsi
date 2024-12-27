@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { Keyboard, StyleSheet, View } from "react-native";
 import React from "react";
 import { ScreenView } from "@/components/ScreenView";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -11,34 +11,11 @@ export default function Verify() {
   const { showAlarm } = useAlarm();
   const { onVerify } = useAuth();
   const { email } = useLocalSearchParams<{ email: string }>();
-  const router = useRouter();
+  // const router = useRouter();
 
   const handleComplete = async (otp: string) => {
     if (otp.length === 6) {
-      try {
-        const result = await onVerify(email, otp);
-        if (result.success) {
-          showAlarm({
-            type: "success",
-            message: "Kirjautuminen onnistui",
-            title: "Onnittelut!",
-          });
-          router.replace("/(tabs)/home");
-        } else {
-          showAlarm({
-            type: "error",
-            message: "Vahvsituskoodi ei ole kelvolinen.",
-            title: "Tarkista!",
-          });
-        }
-      } catch (error) {
-        showAlarm({
-          type: "error",
-          message:
-            "Yritä uudelleen hetken kuluttua tai uudelleenkäynnistä sovellus.",
-          title: "Jokin meni pieleen.",
-        });
-      }
+      await onVerify(email, otp);
     } else {
       showAlarm({
         type: "warning",

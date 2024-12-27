@@ -1,6 +1,5 @@
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import React from "react";
-import { Text } from "@/components/Text";
 import { OnboardingData } from "@/data/onboarding";
 import { COLORS } from "@/constants/colors";
 import Animated, {

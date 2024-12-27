@@ -1,5 +1,5 @@
 import { COLORS } from "@/constants/colors";
-import { StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet } from "react-native";
 import { Canvas, Path, Skia } from "@shopify/react-native-skia";
 import Animated, {
   FadeIn,
@@ -29,7 +29,8 @@ export default function Loading() {
   return (
     <Animated.View exiting={FadeOut} entering={FadeIn} style={styles.container}>
       <Animated.View style={rStyle}>
-        <CustomActivityIndicator progress={progress} />
+        {/* <CustomActivityIndicator progress={progress} /> */}
+        <ActivityIndicator size={"large"} />
       </Animated.View>
     </Animated.View>
   );
@@ -76,9 +77,8 @@ const CustomActivityIndicator = ({ progress }: { progress: any }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.lightBackground,
   },
 });
