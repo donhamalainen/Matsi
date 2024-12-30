@@ -1,0 +1,5 @@
+#### AUTHENTICATION
+curl -X POST https://localhost:443/api/auth/send-login \
+-H "Content-Type: application/json" \
+-d '{"email": "kayttaja@example.com"}' -k
+

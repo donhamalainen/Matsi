@@ -1,4 +1,4 @@
-const pg = require("pg");
+import * as pg from "pg";
 
 // PostgreSQL:n tietokantayhteys
 const pool = new pg.Pool({
@@ -16,7 +16,8 @@ pool.query("SELECT NOW()", (err, res) => {
     console.log("Tietokantayhteys onnistui:", res.rows[0]);
   }
 });
-module.exports = {
+
+export default {
   query: (text, params) => pool.query(text, params),
-  pool: pool,
+  pool,
 };

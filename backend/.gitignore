@@ -3,4 +3,3 @@ node_modules
 # Environments
 .env.*
 .env
-__test__

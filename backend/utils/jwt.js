@@ -1,11 +1,9 @@
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
+import jwt from "jsonwebtoken";
 
-const ACCESS_TOKEN_SECRET =
-  process.env.ACCESS_TOKEN_SECRET || "default_secret_key";
+const SECRET_TOKEN = process.env.SECRET_TOKEN;
 
-// Funktio JWT-tokenin luomiseen
-function signToken(user) {
+// ** JWT CREATE TOKEN **
+function createToken(user) {
   return jwt.sign(
     {
       id: user.id,
@@ -16,31 +14,27 @@ function signToken(user) {
   );
 }
 
-// Funktio JWT-tokenin tarkistamiseen
+// ** JWT VERIFY **
 function verifyToken(token) {
-  return jwt.verify(token, ACCESS_TOKEN_SECRET);
+  return jwt.verify(token, SECRET_TOKEN);
 }
 
-// Middleware JWT-tokenin autentikointiin
+// ** JWT MIDDLEWARE **
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
-    return res.status(401).json({ error: "Pääsy evätty: Token puuttuu" });
+    return res.status(401).json({ error: "Pääsy evätty: tokeni puuttuu" });
   }
 
-  jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: "Token ei kelpaa" });
-    }
+  try {
+    const user = verifyToken(token);
     req.user = user;
     next();
-  });
+  } catch (err) {
+    return res.status(403).json({ error: "Pääsy evätty: virheellinen tokeni" });
+  }
 }
 
-module.exports = {
-  signToken,
-  verifyToken,
-  authenticateToken,
-};
+export { verifyToken, createToken, authenticateToken };
