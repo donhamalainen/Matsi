@@ -1,22 +1,33 @@
 import jwt from "jsonwebtoken";
 
-const SECRET_TOKEN = process.env.SECRET_TOKEN;
-
 // ** JWT CREATE TOKEN **
 function createToken(user) {
   return jwt.sign(
     {
-      id: user.id,
-      username: user.username,
+      email: user.email,
     },
-    ACCESS_TOKEN_SECRET,
+    process.env.SECRET_TOKEN,
     { expiresIn: "365d" }
   );
 }
-
+// *** JWT CREATE TOKEN FOR LOGIN ***
+function createEmailLoginToken(email) {
+  return jwt.sign(
+    {
+      email,
+    },
+    process.env.SECRET_TOKEN,
+    { expiresIn: "15m" }
+  );
+}
 // ** JWT VERIFY **
 function verifyToken(token) {
-  return jwt.verify(token, SECRET_TOKEN);
+  try {
+    return jwt.verify(token, process.env.SECRET_TOKEN);
+  } catch (error) {
+    console.error("Tokenin vahvistamisessa tapahtui virhe:", error.message);
+    throw error;
+  }
 }
 
 // ** JWT MIDDLEWARE **
@@ -37,4 +48,4 @@ function authenticateToken(req, res, next) {
   }
 }
 
-export { verifyToken, createToken, authenticateToken };
+export { verifyToken, createToken, createEmailLoginToken, authenticateToken };

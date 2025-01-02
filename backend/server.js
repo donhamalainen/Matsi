@@ -39,7 +39,7 @@ const HTTPS_SERVER = HTTPS.createServer(CERTIFICATIONS, app);
 const WSS = new WebSocketServer({ noServer: true });
 
 // ** UPGRADE EVENT FOR WEBSOCKET **
-HTTPS_SERVER.on("upgrade", (req, socket, head) => {
+HTTPS_SERVER.on("upgrade", async (req, socket, head) => {
   console.log("Upgrade-tapahtuma havaittu");
 
   const token = req.headers["sec-websocket-protocol"];
@@ -52,7 +52,7 @@ HTTPS_SERVER.on("upgrade", (req, socket, head) => {
 
   // Tarkista token JWT-tarkistuksella
   try {
-    const user = verifyToken(token);
+    const user = await verifyToken(token);
     console.log(`Käyttäjä ${user.username} hyväksytty WebSocket-yhteyteen`);
 
     WSS.handleUpgrade(req, socket, head, (ws) => {
