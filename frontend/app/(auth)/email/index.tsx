@@ -21,32 +21,48 @@ const EmailIndex = () => {
     return emailRegex.test(email);
   };
   const handleSubmit = async () => {
-    showLoading();
     if (!email) {
       showAlarm({
         type: "error",
         title: "Virhe",
-        message: "Vaaditaan sähköpostiosoitettia",
+        message: "Vaaditaan sähköpostiosoite.",
       });
-      hideLoading();
-      return;
-    }
-    const emailResult = await handleEmailCheck(email);
-    if (!emailResult) {
-      showAlarm({
-        type: "error",
-        title: "Virhe",
-        message: "Sähköpostiosoite ei ole kelvolinen",
-      });
-      hideLoading();
       return;
     }
 
-    await onLogin(email).then((res) => {
-      console.log(res);
-      router.replace("/(auth)/email/verify");
+    const isValidEmail = handleEmailCheck(email);
+    if (!isValidEmail) {
+      showAlarm({
+        type: "error",
+        title: "Virhe",
+        message: "Sähköpostiosoite ei ole kelvollinen.",
+      });
+      return;
+    }
+
+    showLoading();
+
+    try {
+      const result = await onLogin(email);
+      if (result.success) {
+        // Jos `onLogin` onnistuu, siirretään käyttäjä email verifiointi sivulle
+        router.push("/(auth)/email/verify");
+      } else {
+        showAlarm({
+          type: "error",
+          title: "Virhe",
+          message: result.message,
+        });
+      }
+    } catch (error: any) {
+      showAlarm({
+        type: "error",
+        title: "Virhe",
+        message: "Odottamaton virhe. Kokeile myöhemmin uudelleen.",
+      });
+    } finally {
       hideLoading();
-    });
+    }
   };
   return (
     <ScreenView>

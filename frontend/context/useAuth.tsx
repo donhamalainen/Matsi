@@ -38,7 +38,7 @@ const AuthContext = createContext<AuthType>({
   isLoading: false,
 });
 
-const API_URL = "http://172.20.10.3:5001/api";
+const API_URL = "http://localhost:5001/api";
 // phone : http://172.20.10.3/
 const WS_URL = "ws://localhost:443";
 
@@ -91,20 +91,92 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
     error?: boolean;
   }> => {
     try {
-      await axios.post(`${API_URL}/auth/send-login`, { email });
+      const result = await axios.post(
+        `${API_URL}/auth/send-login`,
+        { email },
+        {
+          timeout: 5000, // 5 sekunnin aikakatkaisu
+        }
+      );
+      if (result.data.error) {
+        // Jos palvelin palauttaa virheen
+        throw new Error(result.data.message);
+      }
       return {
         success: true,
         message: "Kirjautumislinkki on lähetetty sähköpostiisi.",
       };
     } catch (error: any) {
+      // Timeout-virhe
+      if (error.message === "timeout of 5000ms exceeded") {
+        showAlarm({
+          type: "error",
+          title: "Virhe",
+          message: "Yhteysvirhe: palvelin ei vastaa. Yritä uudelleen.",
+        });
+        return {
+          success: false,
+          message: "Yhteysvirhe: palvelin ei vastaa.",
+          error: true,
+        };
+      }
+
+      // Palvelimen vastauksen virhe
+      if (error.response) {
+        const statusCode = error.response.status;
+
+        // HTTP 400: Virheellinen pyyntö
+        if (statusCode === 400) {
+          showAlarm({
+            type: "error",
+            title: "Virhe",
+            message: "Sähköpostiosoite on virheellinen tai puuttuu.",
+          });
+          return {
+            success: false,
+            message: "Sähköpostiosoite on virheellinen tai puuttuu.",
+            error: true,
+          };
+        }
+
+        // HTTP 500: Palvelinvirhe
+        if (statusCode === 500) {
+          showAlarm({
+            type: "error",
+            title: "Palvelinvirhe",
+            message: "Palvelimella tapahtui virhe. Yritä myöhemmin uudelleen.",
+          });
+          return {
+            success: false,
+            message: "Palvelimella tapahtui virhe.",
+            error: true,
+          };
+        }
+
+        // Muu tunnettu virhe
+        showAlarm({
+          type: "error",
+          title: "Virhe",
+          message:
+            error.response.data?.message || "Tuntematon virhe palvelimella.",
+        });
+        return {
+          success: false,
+          message:
+            error.response.data?.message || "Tuntematon virhe palvelimella.",
+          error: true,
+        };
+      }
+
+      // Tuntematon virhe
       showAlarm({
         type: "error",
         title: "Virhe",
-        message: error.response?.data?.message || "Kirjautuminen epäonnistui.",
+        message: "Odottamaton virhe, kokeile myöhemmin uudelleen.",
       });
       return {
         success: false,
-        message: "Kirjautuminen epäonnistui",
+        message: "Odottamaton virhe, kokeile myöhemmin uudelleen.",
         error: true,
       };
     }
