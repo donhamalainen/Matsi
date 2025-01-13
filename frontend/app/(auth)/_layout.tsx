@@ -10,14 +10,8 @@ export default function AuthLayout() {
     return <Loading />;
   }
   if (session) {
-    return <Redirect href={"/(tabs)/home"} />;
+    return <Redirect href={"/(main)/home"} />;
   }
 
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="sign" />
-      <Stack.Screen name="onboarding" />
-      <Stack.Screen name="email/layout" />
-    </Stack>
-  );
+  return <Stack screenOptions={{ headerShown: false }} />;
 }

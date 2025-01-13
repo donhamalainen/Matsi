@@ -36,7 +36,7 @@ export default function SignScreen() {
           }
           style={{ backgroundColor: COLORS.lightBackground }}
           title="Jatka sähköpostilla"
-          onPress={() => router.replace("/(auth)/email")}
+          onPress={() => router.push("/(auth)/login/email")}
         />
       </View>
 

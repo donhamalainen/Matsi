@@ -1,20 +1,23 @@
 {
   "expo": {
     "name": "Matsi",
-    "slug": "Matsi",
+    "owner": "boggo",
+    "slug": "matsi",
+    "scheme": "matsi-app",
+    "githubUrl": "https://github.com/donhamalainen/Matsi",
+    "platforms": ["ios", "android"],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "matsi-app",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-
     "ios": {
       "usesAppleSignIn": true,
-      "supportsTablet": true,
+      "supportsTablet": false,
       "config": {
         "usesNonExemptEncryption": false
-      }
+      },
+      "bundleIdentifier": "com.boggo.matsi"
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
@@ -40,14 +43,19 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-secure-store"
-      // {
-      //   "configureAndroidBackup": true,
-      //   "faceIDPermission": "Allow ${PRODUCT_NAME} to access your Face ID biometric data."
-      // }
+      "expo-secure-store",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "282ee019-20ad-47f9-b00b-c91ba1158d53"
+      }
     }
   }
 }

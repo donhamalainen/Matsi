@@ -10,6 +10,8 @@ import KeyboardAvoid from "@/components/KeyboardAvoid";
 import { BORDER_RADIUS } from "@/constants/sizing";
 import { router } from "expo-router";
 
+import * as Linking from "expo-linking";
+
 const EmailIndex = () => {
   const { onLogin } = useAuth();
   const { showLoading, hideLoading } = useLoading();
@@ -46,7 +48,7 @@ const EmailIndex = () => {
       const result = await onLogin(email);
       if (result.success) {
         // Jos `onLogin` onnistuu, siirretään käyttäjä email verifiointi sivulle
-        router.push("/(auth)/email/verify");
+        router.navigate("/(auth)/login/verify");
       } else {
         showAlarm({
           type: "error",

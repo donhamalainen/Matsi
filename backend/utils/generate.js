@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { createEmailLoginToken } from "./jwt.js";
 
 const UNIVERSAL_URL = "http://172.20.10.3:3000"; // Website URL
-const APP_SCHEME = "exp";
+const APP_SCHEME = "exp://130.231.5.30:8081";
 // *** COMPARE BCRYPT TOOLS ***
 const compareEmail = async (email, hashedEmail) => {
   return await bcrypt.compare(email, hashedEmail);
@@ -22,7 +22,7 @@ const generateLoginLink = async (email) => {
     const token = await createEmailLoginToken(email);
     const validUntil = new Date(Date.now() + 15 * 60 * 1000).toISOString();
 
-    const deepLink = `${APP_SCHEME}://login?email=${encodeURIComponent(
+    const deepLink = `${APP_SCHEME}/--/login/verify?email=${encodeURIComponent(
       email
     )}&email_hash=${encodeURIComponent(emailHashed)}&token=${encodeURIComponent(
       token

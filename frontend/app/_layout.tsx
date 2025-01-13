@@ -47,18 +47,22 @@ export default function RootLayout() {
       <AlarmProvider>
         <LoadingProvider>
           <AuthProvider>
-            <AnimationContext.Provider value={showTheSplash}>
-              <StatusBar barStyle={"dark-content"} />
-              <Slot />
-            </AnimationContext.Provider>
-            {showTheSplash && (
-              <SplashScreen
-                onAnimationFinished={() => setSplashAnimationFinished(true)}
-              />
-            )}
+            {/* <AnimationContext.Provider value={showTheSplash}> */}
+            <StatusBar barStyle={"dark-content"} />
+            <Slot />
+            {/* </AnimationContext.Provider> */}
           </AuthProvider>
         </LoadingProvider>
       </AlarmProvider>
     </GestureHandlerRootView>
+    //         {showTheSplash && (
+    //           <SplashScreen
+    //             onAnimationFinished={() => setSplashAnimationFinished(true)}
+    //           />
+    //         )}
+    //    </AuthProvider>
+    //        </LoadingProvider>
+    //      </AlarmProvider>
+    //  </GestureHandlerRootView>
   );
 }

@@ -1,6 +1,6 @@
 import { createContext, PropsWithChildren, useContext, useEffect } from "react";
 import { useStorageState } from "./useStorageState";
-import { useRouter, useSegments } from "expo-router";
+import { Redirect, useRouter, useSegments } from "expo-router";
 import axios from "axios";
 import { getStorageItemAsync } from "@/utils/storage";
 import { useAlarm } from "./useAlarm";
@@ -40,9 +40,7 @@ const AuthContext = createContext<AuthType>({
 
 const API_URL = "http://localhost:5001/api";
 // phone : http://172.20.10.3/
-const WS_URL = "ws://localhost:443";
-
-// console.log(API_URL);
+// const WS_URL = "ws://localhost:443";
 
 function useProtectedRoute(session: string | null) {
   const router = useRouter();
@@ -52,7 +50,7 @@ function useProtectedRoute(session: string | null) {
     const onboardingStatus = async () => {
       try {
         const onboardedStatus = await getStorageItemAsync("onboarded");
-        if (!onboardedStatus) return router.replace("/(auth)/onboarding");
+        if (!onboardedStatus) return router.navigate("/(auth)/onboarding");
       } catch (error) {
         console.error("Virhe haettaessa onboard-tilaa:", error);
       }
@@ -64,9 +62,9 @@ function useProtectedRoute(session: string | null) {
   useEffect(() => {
     const inAuth = segments[0] === "(auth)";
     if (!session && !inAuth) {
-      router.replace("/(auth)/sign");
+      router.navigate("/(auth)/sign");
     } else if (session && inAuth) {
-      router.replace("/(tabs)/home");
+      router.navigate("/(main)/home");
     }
   }, [session, segments]);
 }
@@ -74,7 +72,6 @@ function useProtectedRoute(session: string | null) {
 export function AuthProvider({ children }: PropsWithChildren<{}>) {
   const { showAlarm } = useAlarm();
   const [[isLoading, session], setSession] = useStorageState("session");
-  let ws: WebSocket | null = null;
 
   useProtectedRoute(session);
 
@@ -209,7 +206,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
 
       // Opening the WebSocket connection
       // Luo WebSocket-yhteys
-      ws = connectWebSocket();
+      // ws = connectWebSocket();
 
       return {
         success: true,
@@ -229,49 +226,49 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
     }
   };
 
-  /**
-   * Luo WebSocket-yhteys JWT-tokenin avulla
-   */
-  const connectWebSocket = (): WebSocket | null => {
-    if (!session) {
-      showAlarm({
-        type: "error",
-        title: "WebSocket-virhe",
-        message: "Käyttäjän istunto puuttuu. Kirjaudu sisään uudelleen.",
-      });
-      return null;
-    }
+  // /**
+  //  * Luo WebSocket-yhteys JWT-tokenin avulla
+  //  */
+  // const connectWebSocket = (): WebSocket | null => {
+  //   if (!session) {
+  //     showAlarm({
+  //       type: "error",
+  //       title: "WebSocket-virhe",
+  //       message: "Käyttäjän istunto puuttuu. Kirjaudu sisään uudelleen.",
+  //     });
+  //     return null;
+  //   }
 
-    const ws = new WebSocket(WS_URL, ["authorization", `Bearer ${session}`]);
+  //   const ws = new WebSocket(WS_URL, ["authorization", `Bearer ${session}`]);
 
-    ws.onopen = () => {
-      console.log("WebSocket-yhteys avattu.");
-    };
+  //   ws.onopen = () => {
+  //     console.log("WebSocket-yhteys avattu.");
+  //   };
 
-    ws.onmessage = (event) => {
-      console.log("Viestisaapunut:", event.data);
-    };
+  //   ws.onmessage = (event) => {
+  //     console.log("Viestisaapunut:", event.data);
+  //   };
 
-    ws.onclose = () => {
-      console.log("WebSocket-yhteys suljettu.");
-      showAlarm({
-        type: "warning",
-        title: "WebSocket-yhteys suljettu",
-        message: "Yhteys palvelimeen katkesi.",
-      });
-    };
+  //   ws.onclose = () => {
+  //     console.log("WebSocket-yhteys suljettu.");
+  //     showAlarm({
+  //       type: "warning",
+  //       title: "WebSocket-yhteys suljettu",
+  //       message: "Yhteys palvelimeen katkesi.",
+  //     });
+  //   };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket-virhe:", error);
-      showAlarm({
-        type: "error",
-        title: "WebSocket-virhe",
-        message: "Yhteyden muodostaminen epäonnistui.",
-      });
-    };
+  //   ws.onerror = (error) => {
+  //     console.error("WebSocket-virhe:", error);
+  //     showAlarm({
+  //       type: "error",
+  //       title: "WebSocket-virhe",
+  //       message: "Yhteyden muodostaminen epäonnistui.",
+  //     });
+  //   };
 
-    return ws;
-  };
+  //   return ws;
+  // };
 
   /**
    * Function to logout the user and remove the session from the state
