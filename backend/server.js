@@ -19,9 +19,6 @@ app.use(express.json(), helmet());
 
 // ** SERVER ROUTES FOR HTTPS PROTOCOL **
 app.use("/api/auth", AUTH_ROUTE);
-app.get("/*", function (req, res) {
-  res.send("Hello from server!");
-});
 // ** CERTIFICATE **
 // const CERTIFICATIONS = {
 //   key: FS.readFileSync("./certs/cert.key", "utf8"),

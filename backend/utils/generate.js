@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
 import { createEmailLoginToken } from "./jwt.js";
 
-const UNIVERSAL_URL = "http://172.20.10.3:3000"; // Website URL
-const APP_SCHEME = "exp://130.231.5.30:8081";
+const UNIVERSAL_URL = "http://192.168.76.182:3000"; // Website URL
+const APP_SCHEME = "exp://192.168.76.182:8081";
+console.log(UNIVERSAL_URL, APP_SCHEME);
 // *** COMPARE BCRYPT TOOLS ***
 const compareEmail = async (email, hashedEmail) => {
   return await bcrypt.compare(email, hashedEmail);

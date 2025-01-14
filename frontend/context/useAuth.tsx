@@ -1,6 +1,6 @@
 import { createContext, PropsWithChildren, useContext, useEffect } from "react";
 import { useStorageState } from "./useStorageState";
-import { Redirect, useRouter, useSegments } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import axios from "axios";
 import { getStorageItemAsync } from "@/utils/storage";
 import { useAlarm } from "./useAlarm";
@@ -38,8 +38,8 @@ const AuthContext = createContext<AuthType>({
   isLoading: false,
 });
 
-const API_URL = "http://localhost:5001/api";
-// phone : http://172.20.10.3/
+const API_URL = "http://192.168.76.182:5001/api";
+console.log(API_URL);
 // const WS_URL = "ws://localhost:443";
 
 function useProtectedRoute(session: string | null) {
@@ -157,6 +157,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
           message:
             error.response.data?.message || "Tuntematon virhe palvelimella.",
         });
+
         return {
           success: false,
           message:
