@@ -38,7 +38,8 @@ const AuthContext = createContext<AuthType>({
   isLoading: false,
 });
 
-const API_URL = "http://192.168.76.182:5001/api";
+// const API_URL = "http://192.168.76.182:5001/api";
+const API_URL = "http://172.20.10.3:5001/api";
 console.log(API_URL);
 // const WS_URL = "ws://localhost:443";
 
