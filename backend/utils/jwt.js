@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { CONSTANTS } from "../constant/constants.js";
 
 // ** JWT CREATE TOKEN **
 function createToken(user) {
@@ -6,8 +7,8 @@ function createToken(user) {
     {
       email: user.email,
     },
-    process.env.SECRET_TOKEN,
-    { expiresIn: "365d" }
+    CONSTANTS.SECRET_TOKEN,
+    { algorithm: "HS256", expiresIn: "365d" }
   );
 }
 // *** JWT CREATE TOKEN FOR LOGIN ***
@@ -16,14 +17,14 @@ function createEmailLoginToken(email) {
     {
       email,
     },
-    process.env.SECRET_TOKEN,
+    CONSTANTS.SECRET_TOKEN,
     { expiresIn: "15m" }
   );
 }
 // ** JWT VERIFY **
 function verifyToken(token) {
   try {
-    return jwt.verify(token, process.env.SECRET_TOKEN);
+    return jwt.verify(token, CONSTANTS.SECRET_TOKEN);
   } catch (error) {
     console.error("Tokenin vahvistamisessa tapahtui virhe:", error.message);
     throw error;

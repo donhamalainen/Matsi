@@ -13,7 +13,9 @@ type AuthType = {
   }>;
   onVerify: (
     email: string,
-    token: string
+    email_hash: string,
+    token: string,
+    valid_until: string
   ) => Promise<{
     success: boolean;
     message: string;
@@ -38,10 +40,12 @@ const AuthContext = createContext<AuthType>({
   isLoading: false,
 });
 
-// const API_URL = "http://192.168.76.182:5001/api";
-const API_URL = "http://172.20.10.3:5001/api";
-console.log(API_URL);
+const ENVIRONMENT: string = "home";
 // const WS_URL = "ws://localhost:443";
+const API_URL =
+  (ENVIRONMENT === "home" && "http://192.168.76.182:5001/api") ||
+  (ENVIRONMENT === "phone" && "http://172.20.10.3:5001/api");
+console.log(ENVIRONMENT);
 
 function useProtectedRoute(session: string | null) {
   const router = useRouter();
@@ -189,7 +193,9 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
    */
   const onVerify = async (
     email: string,
-    token: string
+    email_hash: string,
+    token: string,
+    valid_until: string
   ): Promise<{
     success: boolean;
     message: string;
@@ -198,9 +204,12 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
     try {
       const response = await axios.post(`${API_URL}/auth/email-login`, {
         email,
+        email_hash,
         token,
+        valid_until,
       });
 
+      console.log(response);
       const authToken = response.data.authToken;
       await setSession(authToken);
 
@@ -215,14 +224,18 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
         message: "Kirjautuminen onnistui.",
       };
     } catch (error: any) {
+      // Näytetään käyttäjälle selkeä virheviesti
+      const errorMessage =
+        error.response?.data?.message || "Kirjautuminen epäonnistui.";
       showAlarm({
         type: "error",
         title: "Virhe",
-        message: error.response?.data?.message || "Kirjautuminen epäonnistui.",
+        message: errorMessage,
       });
+
       return {
         success: false,
-        message: "Kirjautuminen epäonnistui",
+        message: errorMessage,
         error: true,
       };
     }

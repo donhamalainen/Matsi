@@ -1,5 +1,4 @@
 // ** IMPORTS **
-import dotenv from "dotenv";
 // import * as HTTPS from "https";
 import * as HTTP from "http";
 import * as FS from "fs";
@@ -11,7 +10,6 @@ import { verifyToken } from "./utils/jwt.js";
 import AUTH_ROUTE from "./routes/auth.routes.js";
 // ****** SERVER ******
 
-dotenv.config();
 const app = express();
 
 // Middleware

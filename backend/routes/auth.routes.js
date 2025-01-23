@@ -31,19 +31,21 @@ router.post("/send-login", async (req, res) => {
 
 // POST /email-login
 router.post("/email-login", async (req, res) => {
-  const { token, email_hash, valid_until } = req.body;
+  const { email, email_hash, token, valid_until } = req.body;
   // Tarkista, että kaikki parametrit ovat mukana
-  if (!token || !email_hash || !valid_until) {
+  if (!email || !email_hash || !token || !valid_until) {
     return res
       .status(400)
       .json({ error: "Kirjautuminen evätty: sinulta puuttuu parametreja" });
   }
 
   try {
+    console.log(email, email_hash, token, valid_until);
     const decoded = await verifyToken(token);
     const email = decoded.email;
 
-    const isEmailValid = await compareEmail(email, email_hash);
+    const isEmailValid = await verifyEmailHash(email, email_hash);
+    console.log(isEmailValid);
     if (!isEmailValid) {
       return res.status(400).json({
         error: "Virheellinen sähköpostihajautus.",
@@ -65,7 +67,7 @@ router.post("/email-login", async (req, res) => {
       authToken,
     });
   } catch (error) {
-    console.error("Virhe tokenin vahvistamisessa:", err);
+    console.error("Virhe tokenin vahvistamisessa:", error);
     return res
       .status(403)
       .json({ error: "Virheellinen tai vanhentunut token." });
