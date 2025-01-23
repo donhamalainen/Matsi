@@ -18,7 +18,7 @@ function createEmailLoginToken(email) {
       email,
     },
     CONSTANTS.SECRET_TOKEN,
-    { expiresIn: "15m" }
+    { algorithm: "HS256", expiresIn: "15m" }
   );
 }
 // ** JWT VERIFY **

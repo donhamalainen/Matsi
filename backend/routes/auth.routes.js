@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken } from "../utils/jwt.js";
+import { verifyToken, createToken } from "../utils/jwt.js";
 import { sendLoginLink } from "../mail/sendLoginLink.js";
 import { verifyEmailHash } from "../utils/generate.js";
 
@@ -42,29 +42,29 @@ router.post("/email-login", async (req, res) => {
   try {
     console.log(email, email_hash, token, valid_until);
     const decoded = await verifyToken(token);
-    const email = decoded.email;
+    console.log(decoded);
 
-    const isEmailValid = await verifyEmailHash(email, email_hash);
-    console.log(isEmailValid);
-    if (!isEmailValid) {
-      return res.status(400).json({
-        error: "Virheellinen sähköpostihajautus.",
-      });
-    }
+    // const isEmailValid = await verifyEmailHash(email, email_hash);
+    // console.log(isEmailValid);
+    // if (!isEmailValid) {
+    //   return res.status(400).json({
+    //     error: "Virheellinen sähköpostihajautus.",
+    //   });
+    // }
 
-    if (new Date(valid_until) < new Date()) {
-      return res.status(400).json({
-        error: "Linkki on vanhentunut.",
-      });
-    }
+    // if (new Date(valid_until) < new Date()) {
+    //   return res.status(400).json({
+    //     error: "Linkki on vanhentunut.",
+    //   });
+    // }
 
     // Luo autentikaatio-token
-    const authToken = await createToken({ email });
+    // const authToken = await createToken({ email });
 
     // Palauta autentikaatio-token
     return res.status(200).json({
       message: "Kirjautuminen onnistui.",
-      authToken,
+      // authToken,
     });
   } catch (error) {
     console.error("Virhe tokenin vahvistamisessa:", error);
