@@ -40,11 +40,12 @@ const AuthContext = createContext<AuthType>({
   isLoading: false,
 });
 
-const ENVIRONMENT: string = "home";
+const ENVIRONMENT: string = "school";
 // const WS_URL = "ws://localhost:443";
 const API_URL =
   (ENVIRONMENT === "home" && "http://192.168.76.182:5001/api") ||
-  (ENVIRONMENT === "phone" && "http://172.20.10.3:5001/api");
+  (ENVIRONMENT === "phone" && "http://172.20.10.3:5001/api") ||
+  (ENVIRONMENT === "school" && "http://130.231.3.84:5001/api");
 console.log(ENVIRONMENT);
 
 function useProtectedRoute(session: string | null) {

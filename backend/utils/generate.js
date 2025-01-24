@@ -4,11 +4,13 @@ import { CONSTANTS } from "../constant/constants.js";
 
 const UNIVERSAL_URL =
   (CONSTANTS.ENVIRONMENT === "home" && "http://192.168.76.182:3000") ||
-  (CONSTANTS.ENVIRONMENT === "phone" && "http://172.20.10.3:3000");
+  (CONSTANTS.ENVIRONMENT === "phone" && "http://172.20.10.3:3000") ||
+  (CONSTANTS.ENVIRONMENT === "school" && "http://130.231.3.84:3000");
 
 const APP_SCHEME =
   (CONSTANTS.ENVIRONMENT === "home" && "exp://192.168.76.182:8081") ||
-  (CONSTANTS.ENVIRONMENT === "phone" && "exp://172.20.10.3:8081");
+  (CONSTANTS.ENVIRONMENT === "phone" && "exp://172.20.10.3:8081") ||
+  (CONSTANTS.ENVIRONMENT === "school" && "exp://130.231.3.84:8081");
 
 // *** COMPARE BCRYPT TOOLS ***
 const compareEmail = async (email, hashedEmail) => {
