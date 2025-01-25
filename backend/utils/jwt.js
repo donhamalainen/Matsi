@@ -23,6 +23,7 @@ function createEmailLoginToken(email) {
 }
 // ** JWT VERIFY **
 function verifyToken(token) {
+  if (!token) throw new Error("Tokenia ei ole annettu varmennuksessa");
   try {
     return jwt.verify(token, CONSTANTS.SECRET_TOKEN);
   } catch (error) {

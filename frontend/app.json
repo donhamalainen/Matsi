@@ -1,8 +1,7 @@
 {
   "expo": {
     "name": "Matsi",
-    "owner": "boggo",
-    "slug": "matsi",
+    "slug": "Matsi",
     "scheme": "matsi-app",
     "githubUrl": "https://github.com/donhamalainen/Matsi",
     "platforms": ["ios", "android"],

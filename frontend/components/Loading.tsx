@@ -1,17 +1,30 @@
 import { COLORS } from "@/constants/colors";
-import { ActivityIndicator, StyleSheet } from "react-native";
 import { Canvas, Path, Skia } from "@shopify/react-native-skia";
 import Animated, {
   FadeIn,
   FadeOut,
+  interpolate,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
 import { useEffect, useMemo } from "react";
+import { StyleSheet, View } from "react-native";
 
 export default function Loading() {
+  const CanvaSize = 46;
+  const StrokeWidth = 12;
+  const CircleRadius = (CanvaSize - StrokeWidth) / 2;
+
+  // Ympyräpolun luonti
+  const circlePath = useMemo(() => {
+    const skPath = Skia.Path.Make();
+    skPath.addCircle(CanvaSize / 2, CanvaSize / 2, CircleRadius);
+    return skPath;
+  }, []);
+
   const progress = useSharedValue(0);
 
   const rStyle = useAnimatedStyle(() => {
@@ -20,65 +33,37 @@ export default function Loading() {
 
   useEffect(() => {
     progress.value = withRepeat(
-      withTiming(2 * Math.PI, { duration: 1000 }),
-      -1,
-      false
+      withTiming(2 * Math.PI, { duration: 1000 }), // Täysi kierros 1 sekunnissa
+      -1, // Toistuu ikuisesti
+      false // Ei palindromiefektiä
     );
   }, []);
 
   return (
-    <Animated.View exiting={FadeOut} entering={FadeIn} style={styles.container}>
-      <Animated.View style={rStyle}>
-        {/* <CustomActivityIndicator progress={progress} /> */}
-        <ActivityIndicator size={"large"} />
+    <View style={styles.container}>
+      <Animated.View exiting={FadeOut} entering={FadeIn} style={rStyle}>
+        <Canvas style={{ width: CanvaSize, height: CanvaSize }}>
+          <Path
+            path={circlePath}
+            style={"stroke"}
+            color={COLORS.primary}
+            strokeWidth={StrokeWidth}
+            start={0.6}
+            end={1}
+            strokeCap={"round"}
+          />
+        </Canvas>
       </Animated.View>
-    </Animated.View>
+    </View>
   );
 }
-
-const CustomActivityIndicator = ({ progress }: { progress: any }) => {
-  const CanvaSize = 64;
-  const StrokeWidth = 10;
-  const CircleRadius = (CanvaSize - StrokeWidth) / 2;
-
-  const circlePath = useMemo(() => {
-    const skPath = Skia.Path.Make();
-    skPath.addCircle(CanvaSize / 2, CanvaSize / 2, CircleRadius);
-    return skPath;
-  }, []);
-
-  const start = useSharedValue(0.3);
-  const end = useSharedValue(1);
-
-  useEffect(() => {
-    start.value = withRepeat(withTiming(0, { duration: 1000 }), -1, true);
-    end.value = withRepeat(withTiming(1, { duration: 1000 }), -1, true);
-  }, []);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    start: start.value,
-    end: end.value,
-  }));
-
-  return (
-    <Canvas style={{ width: CanvaSize, height: CanvaSize }}>
-      <Path
-        path={circlePath}
-        style={"stroke"}
-        color={COLORS.primary}
-        strokeWidth={StrokeWidth}
-        start={animatedStyle.start}
-        end={animatedStyle.end}
-        strokeCap={"round"}
-      />
-    </Canvas>
-  );
-};
 
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
-    backgroundColor: COLORS.lightBackground,
+    alignItems: "center",
+    zIndex: 9999,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
 });

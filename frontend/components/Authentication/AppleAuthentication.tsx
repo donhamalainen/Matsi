@@ -7,7 +7,7 @@ import { COLORS } from "@/constants/colors";
 import { useAuth } from "@/context/useAuth";
 
 const AppleAuth = () => {
-  const { onAppleLogin } = useAuth();
+  // const { onAppleLogin } = useAuth();
   const handleAppleSignIn = async () => {
     try {
       const credential = await AppleAuthentication.signInAsync({
@@ -19,7 +19,7 @@ const AppleAuth = () => {
         throw new Error("Identity token puuttuu.");
       }
 
-      await onAppleLogin(identityToken);
+      // await onAppleLogin(identityToken);
     } catch (error: any) {
       if (error.code === "ERR_CANCELED") {
         console.log("Käyttäjä peruutti kirjautumisen.");

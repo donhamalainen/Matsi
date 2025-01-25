@@ -2,6 +2,7 @@ import express from "express";
 import { verifyToken, createToken } from "../utils/jwt.js";
 import { sendLoginLink } from "../mail/sendLoginLink.js";
 import { verifyEmailHash } from "../utils/generate.js";
+import pool from "../utils/database.js";
 
 const router = express.Router();
 
@@ -40,37 +41,50 @@ router.post("/email-login", async (req, res) => {
   }
 
   try {
-    console.log(email, email_hash, token, valid_until);
     const decoded = await verifyToken(token);
-    console.log(decoded);
+    const email = decoded.email;
 
-    // const isEmailValid = await verifyEmailHash(email, email_hash);
-    // console.log(isEmailValid);
-    // if (!isEmailValid) {
-    //   return res.status(400).json({
-    //     error: "Virheellinen sähköpostihajautus.",
-    //   });
-    // }
+    const isEmailValid = await verifyEmailHash(email, email_hash);
+    if (!isEmailValid) {
+      return res.status(400).json({
+        error: "Virheellinen sähköpostihajautus.",
+      });
+    }
 
-    // if (new Date(valid_until) < new Date()) {
-    //   return res.status(400).json({
-    //     error: "Linkki on vanhentunut.",
-    //   });
-    // }
+    if (new Date(valid_until) < new Date()) {
+      return res.status(400).json({
+        error: "Linkki on vanhentunut.",
+      });
+    }
 
     // Luo autentikaatio-token
-    // const authToken = await createToken({ email });
+    const authToken = await createToken({ email });
+    console.log(authToken);
 
+    // Tallennetaan tiedot tietokantaan tai jos ne on siellä niin päivitetään
+    const db_user = await pool.query;
+    console.log(db_user);
     // Palauta autentikaatio-token
     return res.status(200).json({
       message: "Kirjautuminen onnistui.",
-      // authToken,
+      authToken,
     });
   } catch (error) {
-    console.error("Virhe tokenin vahvistamisessa:", error);
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        error: "Token on vanhentunut. Pyydä uusi kirjautumislinkki.",
+      });
+    }
+
+    if (error.name === "JsonWebTokenError") {
+      return res.status(403).json({
+        error: "Virheellinen token. Varmista, että linkki on oikein.",
+      });
+    }
+
     return res
-      .status(403)
-      .json({ error: "Virheellinen tai vanhentunut token." });
+      .status(500)
+      .json({ error: "Järjestelmävirhe. Yritä myöhemmin uudelleen." });
   }
 });
 

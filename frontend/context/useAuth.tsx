@@ -1,6 +1,6 @@
 import { createContext, PropsWithChildren, useContext, useEffect } from "react";
 import { useStorageState } from "./useStorageState";
-import { useRouter, useSegments } from "expo-router";
+import { router, useRouter, useSegments } from "expo-router";
 import axios from "axios";
 import { getStorageItemAsync } from "@/utils/storage";
 import { useAlarm } from "./useAlarm";
@@ -40,7 +40,7 @@ const AuthContext = createContext<AuthType>({
   isLoading: false,
 });
 
-const ENVIRONMENT: string = "school";
+const ENVIRONMENT: string = "phone"; // ENVIRONMENT
 // const WS_URL = "ws://localhost:443";
 const API_URL =
   (ENVIRONMENT === "home" && "http://192.168.76.182:5001/api") ||
@@ -56,7 +56,7 @@ function useProtectedRoute(session: string | null) {
     const onboardingStatus = async () => {
       try {
         const onboardedStatus = await getStorageItemAsync("onboarded");
-        if (!onboardedStatus) return router.navigate("/(auth)/onboarding");
+        if (!onboardedStatus) return router.replace("/(auth)/onboarding");
       } catch (error) {
         console.error("Virhe haettaessa onboard-tilaa:", error);
       }
@@ -68,9 +68,9 @@ function useProtectedRoute(session: string | null) {
   useEffect(() => {
     const inAuth = segments[0] === "(auth)";
     if (!session && !inAuth) {
-      router.navigate("/(auth)/sign");
+      router.replace("/(auth)/sign");
     } else if (session && inAuth) {
-      router.navigate("/(main)/home");
+      router.replace("/(main)/home");
     }
   }, [session, segments]);
 }

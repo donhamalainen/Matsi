@@ -2,15 +2,18 @@ import bcrypt from "bcrypt";
 import { createEmailLoginToken } from "./jwt.js";
 import { CONSTANTS } from "../constant/constants.js";
 
-const UNIVERSAL_URL =
+const BUILD = ""; // IF BUILD THEN "BUILD"
+const WEBADD =
   (CONSTANTS.ENVIRONMENT === "home" && "http://192.168.76.182:3000") ||
   (CONSTANTS.ENVIRONMENT === "phone" && "http://172.20.10.3:3000") ||
   (CONSTANTS.ENVIRONMENT === "school" && "http://130.231.3.84:3000");
 
 const APP_SCHEME =
-  (CONSTANTS.ENVIRONMENT === "home" && "exp://192.168.76.182:8081") ||
-  (CONSTANTS.ENVIRONMENT === "phone" && "exp://172.20.10.3:8081") ||
-  (CONSTANTS.ENVIRONMENT === "school" && "exp://130.231.3.84:8081");
+  BUILD === "build"
+    ? "matsi-app://"
+    : (CONSTANTS.ENVIRONMENT === "home" && "exp://192.168.76.182:8081") ||
+      (CONSTANTS.ENVIRONMENT === "phone" && "exp://172.20.10.3:8081") ||
+      (CONSTANTS.ENVIRONMENT === "school" && "exp://130.231.3.84:8081");
 
 // *** COMPARE BCRYPT TOOLS ***
 const compareEmail = async (email, hashedEmail) => {
@@ -31,13 +34,24 @@ const generateLoginLink = async (email) => {
     const token = await createEmailLoginToken(email);
     const validUntil = new Date(Date.now() + 15 * 60 * 1000).toISOString();
 
-    const deepLink = `${APP_SCHEME}/--/login/verify?email=${encodeURIComponent(
-      email
-    )}&email_hash=${encodeURIComponent(emailHashed)}&token=${encodeURIComponent(
-      token
-    )}&valid_until=${encodeURIComponent(validUntil)}`;
+    const deepLink =
+      (BUILD === "build" &&
+        `${APP_SCHEME}/login/verify?email=${encodeURIComponent(
+          email
+        )}&email_hash=${encodeURIComponent(
+          emailHashed
+        )}&token=${encodeURIComponent(token)}&valid_until=${encodeURIComponent(
+          validUntil
+        )}`) ||
+      `${APP_SCHEME}/--/login/verify?email=${encodeURIComponent(
+        email
+      )}&email_hash=${encodeURIComponent(
+        emailHashed
+      )}&token=${encodeURIComponent(token)}&valid_until=${encodeURIComponent(
+        validUntil
+      )}`;
 
-    const universalLink = `${UNIVERSAL_URL}/email-login?login_link=${encodeURIComponent(
+    const universalLink = `${WEBADD}/email-login?login_link=${encodeURIComponent(
       deepLink
     )}&universal=true`;
 

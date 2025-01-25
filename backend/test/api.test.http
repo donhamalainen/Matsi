@@ -3,3 +3,12 @@ curl -X POST https://localhost:443/api/auth/send-login \
 -H "Content-Type: application/json" \
 -d '{"email": "kayttaja@example.com"}' -k
 
+################################
+curl -X POST http://192.168.76.182:5001/api/auth/email-login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "hamalainen.don@gmail.com",
+  "email_hash": "$2b$10$55OL6stn9oQE9rt59U.jt.lyEljK7iKNzZkygQdms4/gBLecVUJ3K",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhhbWFsYWluZW4uZG9uQGdtYWlsLmNvbSIsImlhdCI6MTczNzczNzg1NiwiZXhwIjoxNzM3NzM4NzU2fQ.3tRvaeqpcQ_d4Qxg9_1INGka_ijHidgTX33W1Uzx7UY",
+  "valid_until": "2025-01-24T17:12:36.087Z"
+}'

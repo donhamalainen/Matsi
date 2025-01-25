@@ -21,7 +21,6 @@ const EmailVerify = () => {
       const emailHash = queryParams?.email_hash as string;
       const token = queryParams?.token as string;
       const validUntil = queryParams?.valid_until as string;
-
       if (email && emailHash && token && validUntil) {
         showLoading();
         handleVerify({ email, emailHash, token, validUntil });
@@ -40,19 +39,31 @@ const EmailVerify = () => {
     token: string;
     validUntil: string;
   }) => {
-    console.log(`
-      email: ${email}
-      emailHash: ${emailHash}
-      token: ${token}
-      validUntil: ${validUntil}
-      `);
     try {
-      const result = await onVerify(email, token, emailHash, validUntil);
+      const result = await onVerify(email, emailHash, token, validUntil);
       if (result.success) {
-        router.navigate("/(main)/home");
+        showAlarm({
+          type: "success",
+          title: "Onnistunut",
+          message: "Olet kirjautunut sisään onnistuneesti!",
+        });
+        router.replace("/(main)/home");
+      } else {
+        router.replace("/(auth)/sign");
+        showAlarm({
+          type: "error",
+          title: "Kirjautumisvirhe",
+          message: result.message,
+        });
       }
     } catch (error) {
       console.error("Virhe vahvistamisessa:", error);
+      showAlarm({
+        type: "error",
+        title: "Virhe",
+        message: "Kirjautumisen vahvistaminen epäonnistui.",
+      });
+      router.replace("/(auth)/sign");
     } finally {
       hideLoading();
     }
@@ -100,17 +111,3 @@ const styles = StyleSheet.create({
   },
   footer: {},
 });
-
-function showLoading() {
-  throw new Error("Function not implemented.");
-}
-
-function hideLoading() {
-  throw new Error("Function not implemented.");
-}
-
-function showAlarm(arg0: string, arg1: number) {
-  throw new Error("Function not implemented.");
-}
-// http://localhost:3000/email-login?login_link=matsi-app%3A%2F%2Flogin%3Femail%3Dhamalainen.don%2540gmail.com%26email_hash%3D%25242b%252410%25245J.liZpxSu9tIYRspj4S1O9RpbXF3iOvHE5snsMc8oznbxgm8%252F0JO%26token%3DeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhhbWFsYWluZW4uZG9uQGdtYWlsLmNvbSIsImlhdCI6MTczNjE3NTEzMywiZXhwIjoxNzM2MTc2MDMzfQ.pJ1NoimComR53s3UgIfDm1kcs2afjNk0WNQRZbjUkDc%26valid_until%3D2025-01-06T15%253A07%253A13.338Z&universal=true
-// exp://192.168.76.182:8081/%3A%2F%2Femail%2Fverify%3Femail%3Dhamalainen.don%2540gmail.com%26email_hash%3D%25242b%252410%2524DiDOlfGJkVUctiZNgmPaPedrsl.CImcmFegsOoxjS4nXboyCMWlvm%26token%3DeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhhbWFsYWluZW4uZG9uQGdtYWlsLmNvbSIsImlhdCI6MTczNjM5NzE5OSwiZXhwIjoxNzM2Mzk4MDk5fQ.AoIo2MjkII_CUMdPUQ0shJGGfgui4e8Ht7l0QPfQc-4%26valid_until%3D2025-01-09T04%253A48%253A19.413Z
