@@ -62,8 +62,30 @@ router.post("/email-login", async (req, res) => {
     console.log(authToken);
 
     // Tallennetaan tiedot tietokantaan tai jos ne on siellä niin päivitetään
-    const db_user = await pool.query;
-    console.log(db_user);
+    try {
+      const db_user = await pool.query("SELECT * FROM users WHERE email = $1", [
+        email,
+      ]);
+
+      if (db_user.rows.length > 0) {
+        // Käyttäjä löytyi, päivitetään vain last_login
+        await pool.query(
+          "UPDATE users SET last_login = NOW() WHERE email = $1",
+          [email]
+        );
+        console.log("Käyttäjän kirjautumisaika päivitetty.");
+      } else {
+        // Käyttäjää ei löytynyt, lisätään uusi
+        await pool.query("INSERT INTO users (email) VALUES ($1)", [email]);
+        console.log("Uusi käyttäjä lisätty tietokantaan.");
+      }
+    } catch (dbError) {
+      console.error("Tietokantavirhe:", dbError.message);
+      return res.status(500).json({
+        error: "Tietokantavirhe. Kirjautumista ei voitu suorittaa.",
+      });
+    }
+
     // Palauta autentikaatio-token
     return res.status(200).json({
       message: "Kirjautuminen onnistui.",
