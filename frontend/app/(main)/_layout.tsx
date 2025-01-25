@@ -16,8 +16,6 @@ export default function TabsLayout() {
           title: "Käyttäjä",
         }}
       />
-      {/* <Stack.Screen name="Profile" />
-      <Stack.Screen name="Settings" /> */}
     </Tabs>
   );
 }

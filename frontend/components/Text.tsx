@@ -9,6 +9,7 @@ import { COLORS } from "@/constants/colors";
 
 export type TextVariant =
   | "title"
+  | "title_small"
   | "body"
   | "bodySmall"
   | "bodyLarge"
@@ -28,6 +29,11 @@ export const TextStyles = StyleSheet.create({
   title: {
     fontFamily: "ChillaxMedium",
     fontSize: 32,
+    color: COLORS.black,
+  },
+  title_small: {
+    fontSize: 24,
+    fontFamily: "ChillaxMedium",
     color: COLORS.black,
   },
   headline1: {
