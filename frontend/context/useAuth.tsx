@@ -1,9 +1,14 @@
 import { createContext, PropsWithChildren, useContext, useEffect } from "react";
 import { useStorageState } from "./useStorageState";
-import { router, useRouter, useSegments } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import axios from "axios";
 import { getStorageItemAsync } from "@/utils/storage";
 import { useAlarm } from "./useAlarm";
+import {
+  closeWebSocket,
+  connectWebSocket,
+  reconnectWebSocket,
+} from "@/utils/websocket";
 
 type AuthType = {
   onLogin: (email: string) => Promise<{
@@ -40,7 +45,7 @@ const AuthContext = createContext<AuthType>({
   isLoading: false,
 });
 
-const ENVIRONMENT: string = "phone"; // ENVIRONMENT
+const ENVIRONMENT: string = "home"; // ENVIRONMENT
 // const WS_URL = "ws://localhost:443";
 const API_URL =
   (ENVIRONMENT === "home" && "http://192.168.76.182:5001/api") ||
@@ -71,6 +76,7 @@ function useProtectedRoute(session: string | null) {
       router.replace("/(auth)/sign");
     } else if (session && inAuth) {
       router.replace("/(main)/home");
+      reconnectWebSocket();
     }
   }, [session, segments]);
 }
@@ -217,15 +223,13 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${authToken}`;
 
       // Opening the WebSocket connection
-      // Luo WebSocket-yhteys
-      // ws = connectWebSocket();
+      connectWebSocket({ token: authToken });
 
       return {
         success: true,
         message: "Kirjautuminen onnistui.",
       };
     } catch (error: any) {
-      // Näytetään käyttäjälle selkeä virheviesti
       const errorMessage =
         error.response?.data?.message || "Kirjautuminen epäonnistui.";
       showAlarm({
@@ -242,56 +246,13 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
     }
   };
 
-  // /**
-  //  * Luo WebSocket-yhteys JWT-tokenin avulla
-  //  */
-  // const connectWebSocket = (): WebSocket | null => {
-  //   if (!session) {
-  //     showAlarm({
-  //       type: "error",
-  //       title: "WebSocket-virhe",
-  //       message: "Käyttäjän istunto puuttuu. Kirjaudu sisään uudelleen.",
-  //     });
-  //     return null;
-  //   }
-
-  //   const ws = new WebSocket(WS_URL, ["authorization", `Bearer ${session}`]);
-
-  //   ws.onopen = () => {
-  //     console.log("WebSocket-yhteys avattu.");
-  //   };
-
-  //   ws.onmessage = (event) => {
-  //     console.log("Viestisaapunut:", event.data);
-  //   };
-
-  //   ws.onclose = () => {
-  //     console.log("WebSocket-yhteys suljettu.");
-  //     showAlarm({
-  //       type: "warning",
-  //       title: "WebSocket-yhteys suljettu",
-  //       message: "Yhteys palvelimeen katkesi.",
-  //     });
-  //   };
-
-  //   ws.onerror = (error) => {
-  //     console.error("WebSocket-virhe:", error);
-  //     showAlarm({
-  //       type: "error",
-  //       title: "WebSocket-virhe",
-  //       message: "Yhteyden muodostaminen epäonnistui.",
-  //     });
-  //   };
-
-  //   return ws;
-  // };
-
   /**
    * Function to logout the user and remove the session from the state
    */
   const onLogout = async () => {
     await setSession(null);
     delete axios.defaults.headers.common["Authorization"];
+    closeWebSocket();
   };
   return (
     <AuthContext.Provider

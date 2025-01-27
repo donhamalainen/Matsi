@@ -31,57 +31,68 @@ const HTTP_SERVER = HTTP.createServer(app);
 // noSever: Tells WebSocketServer not to create an HTTP server
 // but to instead handle upgrade requests from the existing
 // server (above).
+
 // const WSS = new WebSocketServer({ noServer: true });
+const WS = new WebSocketServer({ noServer: true });
 
 // // ** UPGRADE EVENT FOR WEBSOCKET **
 // HTTPS_SERVER.on("upgrade", async (req, socket, head) => {
-//   console.log("Upgrade-tapahtuma havaittu");
+HTTP_SERVER.on("upgrade", async (req, socket, head) => {
+  console.log("Upgrade-tapahtuma havaittu");
+  const token = req.headers["authorization"]?.split(" ")[1];
 
-//   const token = req.headers["authorization"]?.split(" ")[1];
+  // if (!token) {
+  //   console.log("Token puuttuu");
+  //   socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+  //   socket.destroy();
+  //   return;
+  // }
 
-//   if (!token) {
-//     console.log("Token puuttuu");
-//     socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
-//     socket.destroy();
-//     return;
-//   }
+  // Tarkista token JWT-tarkistuksella
+  try {
+    // const user = await verifyToken(token);
+    // console.log(`Käyttäjä ${user.username} hyväksytty WebSocket-yhteyteen`);
 
-//   // Tarkista token JWT-tarkistuksella
-//   try {
-//     const user = await verifyToken(token);
-//     console.log(`Käyttäjä ${user.username} hyväksytty WebSocket-yhteyteen`);
-
-//     WSS.handleUpgrade(req, socket, head, (ws) => {
-//       ws.user = user;
-//       WSS.emit("connection", ws, req);
-//     });
-//   } catch (err) {
-//     console.error(`Tokenin tarkistus epäonnistui: ${err.message}`);
-//     socket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
-//     socket.destroy();
-//   }
-// });
+    // WSS.handleUpgrade(req, socket, head, (ws) => {
+    WS.handleUpgrade(req, socket, head, (ws) => {
+      // ws.user = user;
+      // WSS.emit("connection", ws, req);
+      WS.emit("connection", ws, req);
+    });
+  } catch (err) {
+    console.error(`Tokenin tarkistus epäonnistui: ${err.message}`);
+    socket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
+    socket.destroy();
+  }
+});
 
 // // ** WEBSOCKET CONNECTION **
 // WSS.on("connection", (ws, req) => {
-//   console.log("Uusi WebSocket-yhteys avattu");
-//   ws.send("Tervetuloa WebSocket-palvelimeen!");
+WS.on("connection", (ws, req) => {
+  console.log("Uusi WebSocket-yhteys avattu");
+  console.log(req.headers);
+  ws.send("Tervetuloa WebSocket-palvelimeen!");
 
-//   // Kuuntele asiakkaan lähettämiä viestejä
-//   ws.on("message", (message) => {
-//     console.log(`Viesti käyttäjältä ${user.email}: ${message}`);
-//     ws.send(`Hei ${user.email}, viestisi: "${message}" vastaanotettiin.`);
-//   });
+  // Kuuntele asiakkaan lähettämiä viestejä
+  ws.on("message", (message) => {
+    console.log(`Viestisi: "${message}" lähetetty.`);
+    ws.send(`Viestisi: "${message}" vastaanotettu.`);
+  });
 
-//   ws.on("pong", (message) => {
-//     ws.send(`Viestisi: "${message}" vastaanotettu.`);
-//   });
+  ws.on("pong", (message) => {
+    ws.send(`Viestisi: "${message}" vastaanotettu.`);
+  });
 
-//   // Käsittele yhteyden katkeaminen
-//   ws.on("close", () => {
-//     console.log("Asiakas katkaisi yhteyden");
-//   });
-// });
+  ws.on("error", (err) => {
+    console.error(
+      `Virhe WebSocket-yhteydessä käyttäjälle ${ws}: ${err.message}`
+    );
+  });
+
+  ws.on("close", () => {
+    console.log(`Käyttäjä  katkaisi yhteyden.`);
+  });
+});
 
 // *** STARTING THE SERVER ***
 HTTP_SERVER.listen(CONSTANTS.PORT, "0.0.0.0", () => {
