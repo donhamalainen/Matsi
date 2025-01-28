@@ -15,6 +15,7 @@ const APP_SCHEME =
       (CONSTANTS.ENVIRONMENT === "phone" && "exp://172.20.10.3:8081") ||
       (CONSTANTS.ENVIRONMENT === "school" && "exp://130.231.3.84:8081");
 
+console.log(WEBADD);
 // *** COMPARE BCRYPT TOOLS ***
 const compareEmail = async (email, hashedEmail) => {
   return await bcrypt.compare(email, hashedEmail);

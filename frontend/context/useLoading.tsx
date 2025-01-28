@@ -22,7 +22,7 @@ export const LoadingProvider = ({
   children: React.ReactNode;
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  console.log("loading", isLoading);
   const showLoading = () => setIsLoading(true);
   const hideLoading = () => setIsLoading(false);
   return (

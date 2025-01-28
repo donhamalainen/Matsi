@@ -45,7 +45,7 @@ const AuthContext = createContext<AuthType>({
   isLoading: false,
 });
 
-const ENVIRONMENT: string = "home"; // ENVIRONMENT
+const ENVIRONMENT: string = "phone"; // ENVIRONMENT
 // const WS_URL = "ws://localhost:443";
 const API_URL =
   (ENVIRONMENT === "home" && "http://192.168.76.182:5001/api") ||

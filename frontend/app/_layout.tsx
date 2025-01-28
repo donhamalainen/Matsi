@@ -24,6 +24,7 @@ export function useAnimationReady() {
 export default function RootLayout() {
   const [ready, setReady] = useState(false);
   const [splashAnimationFinished, setSplashAnimationFinished] = useState(false);
+
   const [loaded, error] = useFonts({
     ChillaxMedium: require("../assets/fonts/Chillax-Medium.otf"),
     ChillaxSemibold: require("../assets/fonts/Chillax-Semibold.otf"),
@@ -41,7 +42,7 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
 
   const showTheSplash = !ready || !splashAnimationFinished;
-
+  console.log(showTheSplash);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AlarmProvider>
@@ -53,7 +54,7 @@ export default function RootLayout() {
             </AnimationContext.Provider>
             {showTheSplash && (
               <SplashScreen
-                onAnimationFinished={() => setSplashAnimationFinished(true)}
+                onAnimationFinished={() => setSplashAnimationFinished(false)}
               />
             )}
           </AuthProvider>

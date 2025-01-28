@@ -3,9 +3,7 @@ import { Canvas, Path, Skia } from "@shopify/react-native-skia";
 import Animated, {
   FadeIn,
   FadeOut,
-  interpolate,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
   withRepeat,
   withTiming,
@@ -41,6 +39,7 @@ export default function Loading() {
 
   return (
     <View style={styles.container}>
+      {/* TÄSSÄ ON BUGI JOKA NÄYTTÄÄ LATAUKSEN SOVELLUKSEN LATAUTUESSA VILAHDUKSELTA */}
       <Animated.View exiting={FadeOut} entering={FadeIn} style={rStyle}>
         <Canvas style={{ width: CanvaSize, height: CanvaSize }}>
           <Path
